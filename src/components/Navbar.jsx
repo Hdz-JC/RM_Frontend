@@ -19,9 +19,10 @@ function Navbar() {
     return (
         <BootstrapNavbar
             expand="lg"
-            bg="dark"
-            data-bs-theme="dark"
+            bg="white"
+            variant="light"
             sticky="top"
+            className="py-4"
         >
             <Container>
 
@@ -31,7 +32,11 @@ function Navbar() {
                     to="/"
                     className="fw-bold"
                 >
-                    Routines Manager
+                    <img
+                        src="/logoRM.png"
+                        alt="Routines Manager"
+                        height="40"
+                    />
                 </BootstrapNavbar.Brand>
 
 
@@ -82,11 +87,11 @@ function Navbar() {
                     <Nav className="align-items-lg-center">
 
                         <span className="navbar-text me-lg-3">
-                            Hola, {nombreUsuario}
+                            Bienvenido, {nombreUsuario}
                         </span>
 
                         <Button
-                            variant="outline-light"
+                            variant="outline-danger"
                             size="sm"
                             onClick={() => keycloak.logout()}
                         >

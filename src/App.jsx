@@ -1,4 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation
+} from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 
@@ -7,17 +12,16 @@ import Clientes from "./pages/Clientes";
 import Ejercicios from "./pages/Ejercicios";
 import Rutinas from "./pages/Rutinas";
 
-function App() {
+function Paginas() {
+  const location = useLocation();
 
   return (
-    <BrowserRouter>
-
-      <Navbar />
-
-      <main className="container py-4">
-
+    <main className="container py-4">
+      <div
+        key={location.pathname}
+        className="page-transition"
+      >
         <Routes>
-
           <Route
             path="/"
             element={<Inicio />}
@@ -37,11 +41,17 @@ function App() {
             path="/rutinas"
             element={<Rutinas />}
           />
-
         </Routes>
+      </div>
+    </main>
+  );
+}
 
-      </main>
-
+function App() {
+  return (
+    <BrowserRouter>
+      <Navbar />
+      <Paginas />
     </BrowserRouter>
   );
 }

@@ -1,0 +1,418 @@
+/* =========================================================
+   ROUTINES MANAGER
+   Identidad visual
+   ========================================================= */
+
+:root {
+    --rm-primary: #00B8B8;
+    --rm-primary-hover: #009E9E;
+
+    --rm-secondary: #19B5FE;
+    --rm-secondary-hover: #0B9FDE;
+
+    --rm-text: #1F2933;
+    --rm-text-muted: #6B7C87;
+
+    --rm-background: #F4F8FA;
+    --rm-surface: #FFFFFF;
+
+    --rm-border: #E2E8EC;
+
+    --rm-success: #20B486;
+    --rm-danger: #DC3545;
+    --rm-warning: #F4B400;
+}
+
+
+/* =========================================================
+   GENERAL
+   ========================================================= */
+
+body {
+    margin: 0;
+
+    background-color: var(--rm-background);
+
+    color: var(--rm-text);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+}
+
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.navbar {
+    background-color: var(--rm-surface) !important;
+
+    border-bottom: 1px solid var(--rm-border);
+
+    box-shadow: 0 2px 8px rgba(31, 41, 51, 0.05);
+}
+
+.navbar-brand {
+    color: var(--rm-text) !important;
+
+    font-weight: 700;
+}
+
+.navbar-brand:hover {
+    color: var(--rm-primary) !important;
+}
+
+.navbar .nav-link {
+    color: var(--rm-text-muted);
+
+    font-weight: 500;
+
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.navbar .nav-link:hover {
+    color: var(--rm-primary);
+}
+
+.navbar .nav-link.active {
+    color: var(--rm-primary) !important;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+
+.btn-primary {
+    background-color: var(--rm-primary);
+
+    border-color: var(--rm-primary);
+
+    color: #FFFFFF;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--rm-primary-hover) !important;
+
+    border-color: var(--rm-primary-hover) !important;
+}
+
+
+.btn-outline-primary {
+    color: var(--rm-primary);
+
+    border-color: var(--rm-primary);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background-color: var(--rm-primary) !important;
+
+    border-color: var(--rm-primary) !important;
+
+    color: #FFFFFF !important;
+}
+
+
+.btn-info {
+    background-color: var(--rm-secondary);
+
+    border-color: var(--rm-secondary);
+
+    color: #FFFFFF;
+}
+
+.btn-info:hover {
+    background-color: var(--rm-secondary-hover);
+
+    border-color: var(--rm-secondary-hover);
+
+    color: #FFFFFF;
+}
+
+
+.btn-outline-info {
+    color: var(--rm-secondary);
+
+    border-color: var(--rm-secondary);
+}
+
+.btn-outline-info:hover {
+    background-color: var(--rm-secondary);
+
+    border-color: var(--rm-secondary);
+
+    color: #FFFFFF;
+}
+
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+a {
+    color: var(--rm-primary);
+}
+
+a:hover {
+    color: var(--rm-primary-hover);
+}
+
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.card {
+    background-color: var(--rm-surface);
+
+    border-color: var(--rm-border);
+
+    border-radius: 12px;
+}
+
+
+/* =========================================================
+   FORMULARIOS
+   ========================================================= */
+
+.form-control,
+.form-select {
+    border-color: var(--rm-border);
+
+    border-radius: 8px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--rm-primary);
+
+    box-shadow:
+        0 0 0 0.2rem rgba(0, 184, 184, 0.15);
+}
+
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+.nav-tabs {
+    border-bottom-color: var(--rm-border);
+}
+
+.nav-tabs .nav-link {
+    color: var(--rm-text-muted);
+
+    font-weight: 500;
+
+    border: none;
+
+    border-bottom: 2px solid transparent;
+
+    border-radius: 0;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--rm-primary);
+
+    border-color: transparent;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--rm-primary);
+
+    background-color: transparent;
+
+    border-color: transparent;
+
+    border-bottom: 2px solid var(--rm-primary);
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   TABLAS
+   ========================================================= */
+
+.table {
+    color: var(--rm-text);
+}
+
+.table thead {
+    color: var(--rm-text-muted);
+}
+
+.table-light {
+    --bs-table-bg: #F8FAFB;
+}
+
+.table> :not(caption)>*>* {
+    border-bottom-color: var(--rm-border);
+}
+
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.badge.bg-primary {
+    background-color: var(--rm-primary) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--rm-secondary) !important;
+}
+
+
+/* =========================================================
+   TEXTOS
+   ========================================================= */
+
+.text-primary {
+    color: var(--rm-primary) !important;
+}
+
+.text-info {
+    color: var(--rm-secondary) !important;
+}
+
+.text-muted {
+    color: var(--rm-text-muted) !important;
+}
+
+
+/* =========================================================
+   MODALES
+   ========================================================= */
+
+.modal-content {
+    border: none;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 15px 40px rgba(31, 41, 51, 0.15);
+}
+
+.modal-header {
+    border-bottom-color: var(--rm-border);
+}
+
+.modal-footer {
+    border-top-color: var(--rm-border);
+}
+
+
+/* =========================================================
+   SOMBRAS
+   ========================================================= */
+
+.shadow-sm {
+    box-shadow:
+        0 2px 8px rgba(31, 41, 51, 0.06) !important;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--rm-background);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #C8D4DA;
+
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #AABBC4;
+}
+
+/* ========================================
+   TRANSICIONES GENERALES
+   ======================================== */
+
+button,
+.btn,
+.card,
+.form-control,
+.form-select {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Botones */
+button:hover,
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Tarjetas */
+.card {
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.10) !important;
+}
+
+/* Inputs */
+.form-control:focus,
+.form-select:focus {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* Enlaces */
+a {
+    transition: color 0.2s ease;
+}
+
+.card {
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.10) !important;
+}
+
+.page-transition {
+    animation: pageFadeIn 0.3s ease-out;
+}
+
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
