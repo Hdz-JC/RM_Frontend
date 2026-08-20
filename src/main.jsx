@@ -9,7 +9,8 @@ import keycloak from "./keycloak";
 
 keycloak.init({
   onLoad: "login-required",
-  pkceMethod: "S256"
+  pkceMethod: "S256",
+  checkLoginIframe: false
 })
   .then((authenticated) => {
 
