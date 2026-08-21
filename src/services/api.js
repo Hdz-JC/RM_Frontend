@@ -2,7 +2,7 @@ import axios from "axios";
 import keycloak from "../keycloak";
 
 const api = axios.create({
-    baseURL: "https://453jp20r-3000.usw3.devtunnels.ms"
+    baseURL: "https://453jp20r-3000.usw3.devtunnels.ms/api"
 });
 
 api.interceptors.request.use(
