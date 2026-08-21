@@ -1,15 +1,22 @@
 import axios from "axios";
 import keycloak from "../keycloak";
 
+console.log("🔥 API.JS CARGADO");
+console.log("🔥 API BASE:", "https://453jp20r-3000.devtunnels.ms/api");
+
 const api = axios.create({
-    baseURL: "https://453jp20r-3000.usw3.devtunnels.ms/api"
+    baseURL: "https://453jp20r-3000.devtunnels.ms/api"
 });
 
 api.interceptors.request.use(
     async (config) => {
 
-        if (keycloak.authenticated) {
+        console.log("🔥 INTERCEPTOR EJECUTADO");
+        console.log("🔥 URL:", config.url);
+        console.log("🔥 AUTH:", keycloak.authenticated);
+        console.log("🔥 TOKEN:", keycloak.token ? "SI" : "NO");
 
+        if (keycloak.authenticated) {
             await keycloak.updateToken(30);
 
             config.headers.Authorization =
@@ -18,22 +25,7 @@ api.interceptors.request.use(
 
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
-
-api.interceptors.response.use(
-    (response) => response,
-
-    async (error) => {
-
-        if (error.response?.status === 401) {
-            await keycloak.logout();
-        }
-
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
 export default api;
