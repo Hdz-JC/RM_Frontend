@@ -2,24 +2,31 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import api from "../../../services/api";
 
-const logo = "/logoRM.png";
-
-async function cargarImagen(src) {
-    const respuesta = await api.get(src, {
-        responseType: "blob"
-    });
+async function cargarLogo(rutinaId) {
+    const respuesta = await api.get(
+        `/rutinas/${rutinaId}/logo`,
+        {
+            responseType: "blob"
+        }
+    );
 
     return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(respuesta.data);
         const img = new Image();
 
         img.onload = () => {
-            URL.revokeObjectURL(img.src);
+            URL.revokeObjectURL(url);
             resolve(img);
         };
 
-        img.onerror = reject;
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(
+                new Error("No se pudo cargar el logo")
+            );
+        };
 
-        img.src = URL.createObjectURL(respuesta.data);
+        img.src = url;
     });
 }
 
@@ -57,7 +64,8 @@ function formatearFechaPDF(fecha) {
         "diciembre"
     ];
 
-    return `${parseInt(dia)} de ${meses[parseInt(mes) - 1]} de ${anio}`;
+    return `${parseInt(dia)} de ${meses[parseInt(mes) - 1]
+        } de ${anio}`;
 }
 
 export async function generarRutinaPDF(rutina) {
@@ -94,10 +102,8 @@ export async function generarRutinaPDF(rutina) {
     // ENCABEZADO
     // =========================
 
-    const logoUrl = `/rutinas/${rutina.id}/logo`;
-
-    if (logoUrl) {
-        const imagenLogo = await cargarImagen(logoUrl);
+    try {
+        const imagenLogo = await cargarLogo(rutina.id);
 
         doc.addImage(
             imagenLogo,
@@ -106,6 +112,11 @@ export async function generarRutinaPDF(rutina) {
             10,
             50,
             20
+        );
+    } catch (error) {
+        console.error(
+            "ERROR CARGANDO LOGO:",
+            error
         );
     }
 
@@ -203,7 +214,6 @@ export async function generarRutinaPDF(rutina) {
         // =========================
 
         if (ejercicios.length === 0) {
-
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
 
@@ -214,7 +224,6 @@ export async function generarRutinaPDF(rutina) {
             );
 
             posicionY += 15;
-
             return;
         }
 
@@ -223,7 +232,6 @@ export async function generarRutinaPDF(rutina) {
         // =========================
 
         autoTable(doc, {
-
             startY: posicionY + 3,
 
             margin: {
@@ -246,9 +254,6 @@ export async function generarRutinaPDF(rutina) {
                 (ejercicio) => [
                     ejercicio.orden ?? "",
 
-                    // IMPORTANTE:
-                    // La descripción se agrega dentro
-                    // de la misma celda del ejercicio.
                     "",
 
                     ejercicio.categoria ||
@@ -276,7 +281,6 @@ export async function generarRutinaPDF(rutina) {
             },
 
             columnStyles: {
-
                 // #
                 0: {
                     cellWidth: 10,
@@ -317,8 +321,6 @@ export async function generarRutinaPDF(rutina) {
 
             didDrawCell: (data) => {
 
-                // Solo modificar las celdas de
-                // la columna "Ejercicio"
                 if (
                     data.section !== "body" ||
                     data.column.index !== 1
@@ -340,13 +342,10 @@ export async function generarRutinaPDF(rutina) {
                 const x =
                     data.cell.x + 3;
 
-                let y =
+                const y =
                     data.cell.y + 5;
 
-                // -------------------------
                 // NOMBRE
-                // -------------------------
-
                 doc.setFont(
                     "helvetica",
                     "bold"
@@ -360,10 +359,7 @@ export async function generarRutinaPDF(rutina) {
                     y
                 );
 
-                // -------------------------
                 // DESCRIPCIÓN
-                // -------------------------
-
                 if (descripcion) {
 
                     doc.setFont(
@@ -408,7 +404,6 @@ export async function generarRutinaPDF(rutina) {
                 const descripcion =
                     ejercicio.descripcion || "";
 
-                // Altura mínima
                 let altura = 10;
 
                 if (descripcion) {
@@ -419,9 +414,9 @@ export async function generarRutinaPDF(rutina) {
                             65 - 6
                         );
 
-                    // Nombre + descripción
                     altura =
-                        9 + (lineas.length * 3);
+                        9 +
+                        (lineas.length * 3);
                 }
 
                 data.cell.styles.minCellHeight =
