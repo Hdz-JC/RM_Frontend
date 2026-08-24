@@ -1,25 +1,25 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import api from "../../../services/api";
 
 const logo = "/logoRM.png";
 
-function cargarImagen(src) {
+async function cargarImagen(src) {
+    const respuesta = await api.get(src, {
+        responseType: "blob"
+    });
+
     return new Promise((resolve, reject) => {
         const img = new Image();
 
         img.onload = () => {
-            console.log("✅ LOGO CARGADO:", src);
+            URL.revokeObjectURL(img.src);
             resolve(img);
         };
 
-        img.onerror = (error) => {
-            console.error("❌ ERROR CARGANDO LOGO:", src);
-            reject(error);
-        };
+        img.onerror = reject;
 
-        console.log("INTENTANDO CARGAR:", src);
-
-        img.src = src;
+        img.src = URL.createObjectURL(respuesta.data);
     });
 }
 
@@ -94,29 +94,19 @@ export async function generarRutinaPDF(rutina) {
     // ENCABEZADO
     // =========================
 
-    const logoUrl = rutina.entrenador?.logo_url;
-
-    console.log("LOGO URL:", logoUrl);
+    const logoUrl = `/rutinas/${rutina.id}/logo`;
 
     if (logoUrl) {
-        try {
-            const imagenLogo = await cargarImagen(logoUrl);
+        const imagenLogo = await cargarImagen(logoUrl);
 
-            console.log("LOGO CARGADO:", imagenLogo);
-
-            doc.addImage(
-                imagenLogo,
-                "PNG",
-                margen,
-                10,
-                50,
-                20
-            );
-
-            console.log("LOGO AGREGADO AL PDF");
-        } catch (error) {
-            console.error("ERROR CARGANDO LOGO:", error);
-        }
+        doc.addImage(
+            imagenLogo,
+            "PNG",
+            margen,
+            10,
+            50,
+            20
+        );
     }
 
     doc.setFontSize(12);
