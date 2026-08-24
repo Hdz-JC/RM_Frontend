@@ -7,8 +7,17 @@ function cargarImagen(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
 
-        img.onload = () => resolve(img);
-        img.onerror = reject;
+        img.onload = () => {
+            console.log("✅ LOGO CARGADO:", src);
+            resolve(img);
+        };
+
+        img.onerror = (error) => {
+            console.error("❌ ERROR CARGANDO LOGO:", src);
+            reject(error);
+        };
+
+        console.log("INTENTANDO CARGAR:", src);
 
         img.src = src;
     });
