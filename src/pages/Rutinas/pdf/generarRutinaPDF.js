@@ -1,13 +1,15 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-const logo = "/logoRM.png";
-
 function cargarImagen(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
+
+        img.crossOrigin = "Anonymous";
+
         img.onload = () => resolve(img);
         img.onerror = reject;
+
         img.src = src;
     });
 }
@@ -50,6 +52,7 @@ function formatearFechaPDF(fecha) {
 }
 
 export async function generarRutinaPDF(rutina) {
+
     const doc = new jsPDF();
 
     const cliente =
@@ -79,20 +82,31 @@ export async function generarRutinaPDF(rutina) {
 
     const margen = 15;
 
-    // =========================
+    // =====================================================
     // ENCABEZADO
-    // =========================
+    // =====================================================
 
-    const imagenLogo = await cargarImagen("/logoRM.png");
+    const logoUrl = rutina.entrenador?.logo_url;
 
-    doc.addImage(
-        imagenLogo,
-        "PNG",
-        margen,
-        10,
-        50,
-        20
-    );
+    if (logoUrl) {
+        try {
+            const logo = await cargarImagen(logoUrl);
+
+            doc.addImage(
+                logo,
+                "PNG",
+                margen,
+                10,
+                50,
+                20
+            );
+        } catch (error) {
+            console.error(
+                "No se pudo cargar el logo del entrenador:",
+                error
+            );
+        }
+    }
 
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
@@ -112,9 +126,9 @@ export async function generarRutinaPDF(rutina) {
         50
     );
 
-    // =========================
+    // =====================================================
     // INFORMACIÓN
-    // =========================
+    // =====================================================
 
     autoTable(doc, {
         startY: 55,
@@ -153,9 +167,9 @@ export async function generarRutinaPDF(rutina) {
     let posicionY =
         doc.lastAutoTable.finalY + 8;
 
-    // =========================
+    // =====================================================
     // DÍAS Y EJERCICIOS
-    // =========================
+    // =====================================================
 
     dias.forEach((dia) => {
 
@@ -165,9 +179,9 @@ export async function generarRutinaPDF(rutina) {
             posicionY = 20;
         }
 
-        // =========================
+        // =================================================
         // NOMBRE DEL DÍA
-        // =========================
+        // =================================================
 
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
@@ -183,9 +197,9 @@ export async function generarRutinaPDF(rutina) {
         const ejercicios =
             dia.ejercicios || [];
 
-        // =========================
+        // =================================================
         // SIN EJERCICIOS
-        // =========================
+        // =================================================
 
         if (ejercicios.length === 0) {
 
@@ -203,9 +217,9 @@ export async function generarRutinaPDF(rutina) {
             return;
         }
 
-        // =========================
+        // =================================================
         // TABLA DE EJERCICIOS
-        // =========================
+        // =================================================
 
         autoTable(doc, {
 
@@ -227,14 +241,27 @@ export async function generarRutinaPDF(rutina) {
                 ]
             ],
 
-            body: ejercicios.map(
-                (ejercicio) => [
+            body: ejercicios.map((ejercicio) => {
+
+                const nombre =
+                    ejercicio.nombre || "";
+
+                const descripcion =
+                    ejercicio.descripcion || "";
+
+                /*
+                 * La descripción se muestra debajo
+                 * del nombre del ejercicio.
+                 */
+
+                const ejercicioTexto = descripcion
+                    ? `${nombre}\n${descripcion}`
+                    : nombre;
+
+                return [
                     ejercicio.orden ?? "",
 
-                    // IMPORTANTE:
-                    // La descripción se agrega dentro
-                    // de la misma celda del ejercicio.
-                    "",
+                    ejercicioTexto,
 
                     ejercicio.categoria ||
                     "Sin categoría",
@@ -245,8 +272,8 @@ export async function generarRutinaPDF(rutina) {
 
                     ejercicio.comentarios ||
                     "—"
-                ]
-            ),
+                ];
+            }),
 
             styles: {
                 fontSize: 8,
@@ -268,7 +295,7 @@ export async function generarRutinaPDF(rutina) {
                     halign: "center"
                 },
 
-                // Ejercicio
+                // Ejercicio + descripción
                 1: {
                     cellWidth: 65
                 },
@@ -296,14 +323,48 @@ export async function generarRutinaPDF(rutina) {
                 }
             },
 
-            // =========================
-            // DIBUJAR NOMBRE + DESCRIPCIÓN
-            // =========================
+            didParseCell: (data) => {
+
+                // Solo las celdas de ejercicios
+                if (
+                    data.section !== "body" ||
+                    data.column.index !== 1
+                ) {
+                    return;
+                }
+
+                const ejercicio =
+                    ejercicios[data.row.index];
+
+                if (!ejercicio) return;
+
+                /*
+                 * Primera línea = nombre
+                 * Segunda línea = descripción
+                 */
+
+                data.cell.text = [];
+
+                const nombre =
+                    ejercicio.nombre || "";
+
+                const descripcion =
+                    ejercicio.descripcion || "";
+
+                data.cell.text.push(nombre);
+
+                if (descripcion) {
+                    data.cell.text.push(descripcion);
+                }
+
+                // Altura de la celda
+                data.cell.styles.minCellHeight =
+                    descripcion ? 15 : 10;
+            },
 
             didDrawCell: (data) => {
 
-                // Solo modificar las celdas de
-                // la columna "Ejercicio"
+                // Solo columna Ejercicio
                 if (
                     data.section !== "body" ||
                     data.column.index !== 1
@@ -328,9 +389,9 @@ export async function generarRutinaPDF(rutina) {
                 let y =
                     data.cell.y + 5;
 
-                // -------------------------
+                // -----------------------------
                 // NOMBRE
-                // -------------------------
+                // -----------------------------
 
                 doc.setFont(
                     "helvetica",
@@ -345,9 +406,9 @@ export async function generarRutinaPDF(rutina) {
                     y
                 );
 
-                // -------------------------
+                // -----------------------------
                 // DESCRIPCIÓN
-                // -------------------------
+                // -----------------------------
 
                 if (descripcion) {
 
@@ -372,51 +433,6 @@ export async function generarRutinaPDF(rutina) {
                 }
             },
 
-            // =========================
-            // ALTURA DE LAS CELDAS
-            // =========================
-
-            didParseCell: (data) => {
-
-                if (
-                    data.section !== "body" ||
-                    data.column.index !== 1
-                ) {
-                    return;
-                }
-
-                const ejercicio =
-                    ejercicios[data.row.index];
-
-                if (!ejercicio) return;
-
-                const descripcion =
-                    ejercicio.descripcion || "";
-
-                // Altura mínima
-                let altura = 10;
-
-                if (descripcion) {
-
-                    const lineas =
-                        doc.splitTextToSize(
-                            descripcion,
-                            65 - 6
-                        );
-
-                    // Nombre + descripción
-                    altura =
-                        9 + (lineas.length * 3);
-                }
-
-                data.cell.styles.minCellHeight =
-                    altura;
-            },
-
-            // =========================
-            // PIE DE PÁGINA
-            // =========================
-
             didDrawPage: () => {
                 agregarPiePagina(doc);
             }
@@ -426,9 +442,9 @@ export async function generarRutinaPDF(rutina) {
             doc.lastAutoTable.finalY + 10;
     });
 
-    // =========================
+    // =====================================================
     // PIE DE TODAS LAS PÁGINAS
-    // =========================
+    // =====================================================
 
     const paginas =
         doc.internal.getNumberOfPages();
@@ -442,9 +458,9 @@ export async function generarRutinaPDF(rutina) {
         agregarPiePagina(doc);
     }
 
-    // =========================
+    // =====================================================
     // DESCARGAR
-    // =========================
+    // =====================================================
 
     const nombreArchivo = [
         "Rutina",
@@ -459,9 +475,10 @@ export async function generarRutinaPDF(rutina) {
     );
 }
 
-// =========================
+
+// =========================================================
 // PIE DE PÁGINA
-// =========================
+// =========================================================
 
 function agregarPiePagina(doc) {
 
