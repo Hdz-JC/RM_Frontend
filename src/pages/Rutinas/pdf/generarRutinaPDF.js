@@ -87,9 +87,13 @@ export async function generarRutinaPDF(rutina) {
 
     const logoUrl = rutina.entrenador?.logo_url;
 
+    console.log("LOGO URL:", logoUrl);
+
     if (logoUrl) {
         try {
             const imagenLogo = await cargarImagen(logoUrl);
+
+            console.log("LOGO CARGADO:", imagenLogo);
 
             doc.addImage(
                 imagenLogo,
@@ -99,11 +103,10 @@ export async function generarRutinaPDF(rutina) {
                 50,
                 20
             );
+
+            console.log("LOGO AGREGADO AL PDF");
         } catch (error) {
-            console.error(
-                "No se pudo cargar el logo del entrenador:",
-                error
-            );
+            console.error("ERROR CARGANDO LOGO:", error);
         }
     }
 
