@@ -2,31 +2,21 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import api from "../../../services/api";
 
-async function cargarLogo(rutinaId) {
-    const respuesta = await api.get(
-        `/rutinas/${rutinaId}/logo`,
-        {
-            responseType: "blob"
-        }
-    );
+async function cargarImagen(src) {
+    const respuesta = await api.get(src, {
+        responseType: "blob"
+    });
 
     return new Promise((resolve, reject) => {
-        const url = URL.createObjectURL(respuesta.data);
-        const img = new Image();
+        const reader = new FileReader();
 
-        img.onload = () => {
-            URL.revokeObjectURL(url);
-            resolve(img);
+        reader.onloadend = () => {
+            resolve(reader.result);
         };
 
-        img.onerror = () => {
-            URL.revokeObjectURL(url);
-            reject(
-                new Error("No se pudo cargar el logo")
-            );
-        };
+        reader.onerror = reject;
 
-        img.src = url;
+        reader.readAsDataURL(respuesta.data);
     });
 }
 
@@ -64,8 +54,7 @@ function formatearFechaPDF(fecha) {
         "diciembre"
     ];
 
-    return `${parseInt(dia)} de ${meses[parseInt(mes) - 1]
-        } de ${anio}`;
+    return `${parseInt(dia)} de ${meses[parseInt(mes) - 1]} de ${anio}`;
 }
 
 export async function generarRutinaPDF(rutina) {
@@ -103,7 +92,11 @@ export async function generarRutinaPDF(rutina) {
     // =========================
 
     try {
-        const imagenLogo = await cargarLogo(rutina.id);
+        const logoUrl = `/rutinas/${rutina.id}/logo`;
+
+        console.log("LOGO API:", logoUrl);
+
+        const imagenLogo = await cargarImagen(logoUrl);
 
         doc.addImage(
             imagenLogo,
@@ -113,11 +106,10 @@ export async function generarRutinaPDF(rutina) {
             50,
             20
         );
+
+        console.log("✅ LOGO AGREGADO AL PDF");
     } catch (error) {
-        console.error(
-            "ERROR CARGANDO LOGO:",
-            error
-        );
+        console.error("❌ ERROR CARGANDO LOGO:", error);
     }
 
     doc.setFontSize(12);
@@ -185,7 +177,6 @@ export async function generarRutinaPDF(rutina) {
 
     dias.forEach((dia) => {
 
-        // Si estamos cerca del final de la página
         if (posicionY > 250) {
             doc.addPage();
             posicionY = 20;
@@ -214,6 +205,7 @@ export async function generarRutinaPDF(rutina) {
         // =========================
 
         if (ejercicios.length === 0) {
+
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
 
@@ -224,6 +216,7 @@ export async function generarRutinaPDF(rutina) {
             );
 
             posicionY += 15;
+
             return;
         }
 
@@ -232,6 +225,7 @@ export async function generarRutinaPDF(rutina) {
         // =========================
 
         autoTable(doc, {
+
             startY: posicionY + 3,
 
             margin: {
@@ -281,35 +275,30 @@ export async function generarRutinaPDF(rutina) {
             },
 
             columnStyles: {
-                // #
+
                 0: {
                     cellWidth: 10,
                     halign: "center"
                 },
 
-                // Ejercicio
                 1: {
                     cellWidth: 65
                 },
 
-                // Categoría
                 2: {
                     cellWidth: 28
                 },
 
-                // Series
                 3: {
                     cellWidth: 15,
                     halign: "center"
                 },
 
-                // Reps
                 4: {
                     cellWidth: 15,
                     halign: "center"
                 },
 
-                // Comentarios
                 5: {
                     cellWidth: "auto"
                 }
@@ -346,6 +335,7 @@ export async function generarRutinaPDF(rutina) {
                     data.cell.y + 5;
 
                 // NOMBRE
+
                 doc.setFont(
                     "helvetica",
                     "bold"
@@ -360,6 +350,7 @@ export async function generarRutinaPDF(rutina) {
                 );
 
                 // DESCRIPCIÓN
+
                 if (descripcion) {
 
                     doc.setFont(
@@ -415,8 +406,7 @@ export async function generarRutinaPDF(rutina) {
                         );
 
                     altura =
-                        9 +
-                        (lineas.length * 3);
+                        9 + (lineas.length * 3);
                 }
 
                 data.cell.styles.minCellHeight =
